@@ -1,0 +1,60 @@
+OBTENER IMAGEN
+docker pull ocsinventory-docker-image:latest
+
+INICIAR CONTENEDOR
+docker run -it --name ocsinventorydos \
+-p 8080:80 \
+-e OCS_DBNAME=ocsweb \
+-e OCS_DBSERVER_READ=db_ocs \
+-e OCS_DBSERVER_WRITE=db_ocs \
+-e OCS_DBUSER=ocs \
+-e OCS_DBPASS=ocs24cfe \
+ocsinventory/ocsinventory-docker-image:latest /bin/bash
+
+
+ARCHIVOS QUE EDITAR
+
+-------------z-ocsinventory-server.conf--------------/etc/apache2/conf-enabled
+datos de la instalación mismos que dbconfig
+PerlSetEnv OCS_OPT_DBI_PRINT_ERROR 0    #en esta linea falta en cero.
+PerlSetEnv SNMP_LINK_TAG 0              #agregar esta linea en alguna parte
+
+-------------zz-ocsinventory-ocsinventory-restapi.conf--------------/etc/apache2/conf-enabled
+datos de la instalación mismos que dbconfig
+
+-------------------dbconfig.inc.php------------------/usr/share/ocsinventory-reports/ocsreports
+define("DB_NAME", "ocsweb");
+define("SERVER_READ", "db_ocs");
+define("SERVER_WRITE", "db_ocs");
+define("SERVER_PORT", "3306");
+define("COMPTE_BASE", "ocs");
+define("PSWD_BASE", "ocs24cfe");
+
+------------------000-default.conf-------------------/etc/apache2/sites-available
+Alias /ocsreports /usr/share/ocsinventory-reports   #agregar esta linea antes del final
+
+----------------------apache2.conf-------------------/etc/apache2
+ServerName localhost    #agregar esta linea al final
+
+****************************************************************************
+INSTALAR DEPENDENCIAS
+
+apt update &&apt upgrade -y
+
+apt-get install -y cpanminus libxml-entities-perl build-essential libsnmp-dev iputils-ping vim
+
+cpanm XML::Entities
+
+cpanm SNMP   #dependencias SNMP
+
+***************************************************************************
+conectar a la misma red
+docker network connect mi-red ocsinventorydos
+
+************************************************************************
+ARCHIVO INSTALL.PHP PERDIDO     #crearlo dentro de /usr/share/ocsinventory-reports/ocsreports/
+
+**contenido de aarchivo install.php esta en esta carpeta github**
+
+*************************************************************
+
