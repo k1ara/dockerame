@@ -4,6 +4,7 @@ docker pull ocsinventory-docker-image:latest
 INICIAR CONTENEDOR
 docker run -it --name ocsinventorydos \
 -p 8080:80 \
+-e TZ="America/Panama" \
 -e OCS_DBNAME=ocsweb \
 -e OCS_DBSERVER_READ=db_ocs \
 -e OCS_DBSERVER_WRITE=db_ocs \
