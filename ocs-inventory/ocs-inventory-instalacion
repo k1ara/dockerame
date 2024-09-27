@@ -7,6 +7,9 @@ docker run -it --name ocsinventorydos \
 -p 80:80 \
 -p 443:443 \
 -e TZ="America/Panama" \
+-v ocsdata:/usr/share/ocsinventory-reports/ \
+-v ocsdata:/etc/ocsinventory-reports/ \
+-v ocsdata:/var/lib/ocsinventory-reports/ \
 -e OCS_DBNAME=ocsweb \
 -e OCS_DBSERVER_READ=db_ocs \
 -e OCS_DBSERVER_WRITE=db_ocs \
