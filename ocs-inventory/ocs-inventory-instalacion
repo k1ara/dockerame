@@ -70,3 +70,8 @@ chown www-data:www-data install.php   #agregar el archivo a los grupos correctos
 ------------------ports.conf----------------------/etc/apache2
 VERIFICAR QUE SE ESCUCHE POR EL PUERTO 8080
 Listen 8080   #agregar esta linea si no esta
+
+---------------cron_all_software.php--------------/usr/share/ocsinventory-reports/ocsreports/crontab
+SI ALL_SOFTWARE EN EL INVENTARIO ESTÁ VACIO EJECUTAR LA LINEA
+
+/bin/php /usr/share/ocsinventory-reports/ocsreports/crontab/cron_all_software.php #activar este proceso
