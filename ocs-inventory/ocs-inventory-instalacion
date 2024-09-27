@@ -12,6 +12,16 @@ docker run -it --name ocsinventorydos \
 -e OCS_DBPASS=ocs24cfe \
 ocsinventory/ocsinventory-docker-image:latest /bin/bash
 
+****************************************************************************
+INSTALAR DEPENDENCIAS
+
+apt update && apt upgrade -y
+
+apt-get install -y cpanminus libxml-entities-perl build-essential libsnmp-dev iputils-ping vim
+
+cpanm XML::Entities
+
+cpanm SNMP   #dependencias SNMP
 
 ARCHIVOS QUE EDITAR
 
@@ -37,17 +47,6 @@ Alias /ocsreports /usr/share/ocsinventory-reports   #agregar esta linea antes de
 ----------------------apache2.conf-------------------/etc/apache2
 ServerName localhost    #agregar esta linea al final
 
-****************************************************************************
-INSTALAR DEPENDENCIAS
-
-apt update &&apt upgrade -y
-
-apt-get install -y cpanminus libxml-entities-perl build-essential libsnmp-dev iputils-ping vim
-
-cpanm XML::Entities
-
-cpanm SNMP   #dependencias SNMP
-
 ***************************************************************************
 conectar a la misma red
 docker network connect mi-red ocsinventorydos
@@ -56,6 +55,9 @@ docker network connect mi-red ocsinventorydos
 ARCHIVO INSTALL.PHP PERDIDO     #crearlo dentro de /usr/share/ocsinventory-reports/ocsreports/
 
 **contenido de aarchivo install.php esta en esta carpeta github**
+
+chmod 755 install.php    #dar permisos de ejecucion
+chown www-data:www-data install.php   #agregar el archivo a los grupos correctos para apache
 
 *************************************************************
 
