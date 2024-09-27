@@ -19,11 +19,9 @@ INSTALAR DEPENDENCIAS
 
 apt update && apt upgrade -y
 
-apt-get install -y cpanminus libxml-entities-perl build-essential libsnmp-dev iputils-ping vim net-tools
+apt-get install -y cpanminus build-essential libsnmp-dev iputils-ping vim net-tools
 
-cpanm XML::Entities
-
-cpanm SNMP   #dependencias SNMP
+cpanm XML::Entities SNMP    #dependencias XML y SNMP
 
 ARCHIVOS QUE EDITAR
 
@@ -50,6 +48,7 @@ Alias /ocsreports /usr/share/ocsinventory-reports   #agregar esta linea antes de
 
 ----------------------apache2.conf-------------------/etc/apache2
 ServerName localhost    #agregar esta linea al final
+ServerName leliel.cfe.local  #nombre del servidor
 
 ***************************************************************************
 conectar a la misma red
