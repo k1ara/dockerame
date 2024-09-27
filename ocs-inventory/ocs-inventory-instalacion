@@ -17,7 +17,7 @@ INSTALAR DEPENDENCIAS
 
 apt update && apt upgrade -y
 
-apt-get install -y cpanminus libxml-entities-perl build-essential libsnmp-dev iputils-ping vim
+apt-get install -y cpanminus libxml-entities-perl build-essential libsnmp-dev iputils-ping vim net-tools
 
 cpanm XML::Entities
 
@@ -42,6 +42,8 @@ define("COMPTE_BASE", "ocs");
 define("PSWD_BASE", "ocs24cfe");
 
 ------------------000-default.conf-------------------/etc/apache2/sites-available
+<VirtualHost *:8080>   #verificar que el puerto virtual sea 8080
+
 Alias /ocsreports /usr/share/ocsinventory-reports   #agregar esta linea antes del final
 
 ----------------------apache2.conf-------------------/etc/apache2
@@ -61,3 +63,6 @@ chown www-data:www-data install.php   #agregar el archivo a los grupos correctos
 
 *************************************************************
 
+------------------ports.conf----------------------/etc/apache2
+VERIFICAR QUE SE ESCUCHE POR EL PUERTO 8080
+Listen 8080   #agregar esta linea si no esta
