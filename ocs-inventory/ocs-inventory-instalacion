@@ -1,7 +1,8 @@
 OBTENER IMAGEN
-docker pull ocsinventory-docker-image:latest
 
-INICIAR CONTENEDOR
+docker pull ocsinventory-docker-image:latest   #obtener la ultima imagen del contenedor
+
+INICIAR CONTENEDOR                      #variables que deberian hacer efecto en una imagen de docker correcta
 docker run -it --name ocsinventory \
 -p 8080:80 \
 -p 80:80 \
@@ -15,14 +16,14 @@ docker run -it --name ocsinventory \
 -e OCS_DBSERVER_WRITE=db_ocs \
 -e OCS_DBUSER=ocs \
 -e OCS_DBPASS=ocs24cfe \
-ocsinventory/ocsinventory-docker-image:latest /bin/bash
+ocsinventory/ocsinventory-docker-image:latest /bin/bash  #/bin/bash solo se agrega proque la imagen oficial esta corrupta y hay que editar el contenedor
 
 ****************************************************************************
 INSTALAR DEPENDENCIAS
 
-apt update && apt upgrade -y
+apt update && apt upgrade -y   #actualizar
 
-apt-get install -y cpanminus build-essential libsnmp-dev iputils-ping vim net-tools apache2-dev
+apt-get install -y cpanminus build-essential libsnmp-dev iputils-ping vim net-tools apache2-dev #dependencias y programas utiles
 
 cpanm XML::Entities SNMP YAML Apache2::SOAP    #dependencias XML y SNMP
 
@@ -51,11 +52,11 @@ define("PSWD_BASE", "ocs24cfe");
 ------------------000-default.conf-------------------/etc/apache2/sites-available
 <VirtualHost *:8080>   #verificar que el puerto virtual sea 8080
 
-Alias /ocsreports /usr/share/ocsinventory-reports   #agregar esta linea antes del final
+Alias /ocsreports /usr/share/ocsinventory-reports   #agregar esta linea
 
 ----------------------apache2.conf-------------------/etc/apache2
 ServerName localhost    #agregar esta linea al final
-ServerName leliel.cfe.local  #nombre del servidor
+ServerName leliel.cfe.local  #nombre del servidor definido en un DNS server
 
 ***************************************************************************
 conectar a la misma red
