@@ -60,6 +60,7 @@ ServerName leliel.cfe.local  #nombre del servidor definido en un DNS server
 
 ***************************************************************************
 conectar a la misma red
+docker network ls
 docker network connect mi-red ocsinventorydos
 
 ************************************************************************
