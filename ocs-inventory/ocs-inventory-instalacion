@@ -2,7 +2,7 @@ OBTENER IMAGEN
 docker pull ocsinventory-docker-image:latest
 
 INICIAR CONTENEDOR
-docker run -it --name ocsinventorydos \
+docker run -it --name ocsinventory \
 -p 8080:80 \
 -p 80:80 \
 -p 443:443 \
