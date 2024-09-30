@@ -22,19 +22,23 @@ INSTALAR DEPENDENCIAS
 
 apt update && apt upgrade -y
 
-apt-get install -y cpanminus build-essential libsnmp-dev iputils-ping vim net-tools
+apt-get install -y cpanminus build-essential libsnmp-dev iputils-ping vim net-tools apache2-dev
 
-cpanm XML::Entities SNMP    #dependencias XML y SNMP
+cpanm XML::Entities SNMP YAML Apache2::SOAP    #dependencias XML y SNMP
 
 ARCHIVOS QUE EDITAR
 
 -------------z-ocsinventory-server.conf--------------/etc/apache2/conf-enabled
 datos de la instalación mismos que dbconfig
 PerlSetEnv OCS_OPT_DBI_PRINT_ERROR 0    #en esta linea falta en cero.
-PerlSetEnv SNMP_LINK_TAG 0              #agregar esta linea en alguna parte
+PerlSetEnv OCS_OPT_SNMP_LINK_TAG 0      #agregar esta linea en alguna parte
 
 -------------zz-ocsinventory-ocsinventory-restapi.conf--------------/etc/apache2/conf-enabled
 datos de la instalación mismos que dbconfig
+
+-------------ocsinventory-reports.conf--------------/etc/apache2/conf-available
+php_value post_max_size         1001m    #editar estas lineas
+php_value upload_max_filesize   1000m    #editar estas lineas
 
 -------------------dbconfig.inc.php------------------/usr/share/ocsinventory-reports/ocsreports
 define("DB_NAME", "ocsweb");
@@ -75,3 +79,4 @@ Listen 8080   #agregar esta linea si no esta
 SI ALL_SOFTWARE EN EL INVENTARIO ESTÁ VACIO EJECUTAR LA LINEA
 
 /bin/php /usr/share/ocsinventory-reports/ocsreports/crontab/cron_all_software.php #activar este proceso
+
