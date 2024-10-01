@@ -17,14 +17,21 @@ RUN apt-get update && \
 
 # Editar archivos de configuración
 COPY dbconfig.inc.php /usr/share/ocsinventory-reports/ocsreports/dbconfig.inc.php
-COPY z-ocsinventory-server.conf /etc/apache2/conf-enabled/z-ocsinventory-server.conf
-COPY zz-ocsinventory-ocsinventory-restapi.conf /etc/apache2/conf-enabled/zz-ocsinventory-ocsinventory-restapi.conf
-COPY ocsinventory-reports.conf /etc/apache2/conf-available/ocsinventory-reports.conf
-COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY apache2.conf /etc/apache2/apache2.conf
 COPY install.php /usr/share/ocsinventory-reports/ocsreports/install.php
 
-# Permisos para install.php
+# Eliminar archivos reales si ya existen y crear enlaces simbólicos
+RUN if [ -f /etc/apache2/conf-enabled/z-ocsinventory-server.conf ]; then rm /etc/apache2/conf-enabled/z-ocsinventory-server.conf; fi && \
+    ln -s /etc/apache2/conf-available/z-ocsinventory-server.conf /etc/apache2/conf-enabled/z-ocsinventory-server.conf && \
+    if [ -f /etc/apache2/conf-enabled/zz-ocsinventory-ocsinventory-restapi.conf ]; then rm /etc/apache2/conf-enabled/zz-ocsinventory-ocsinventory-restapi.conf; fi && \
+    ln -s /etc/apache2/conf-available/zz-ocsinventory-ocsinventory-restapi.conf /etc/apache2/conf-enabled/zz-ocsinventory-ocsinventory-restapi.conf && \
+    if [ -f /etc/apache2/conf-enabled/ocsinventory-reports.conf ]; then rm /etc/apache2/conf-enabled/ocsinventory-reports.conf; fi && \
+    ln -s /etc/apache2/conf-available/ocsinventory-reports.conf /etc/apache2/conf-enabled/ocsinventory-reports.conf && \
+    if [ -f /etc/apache2/sites-enabled/000-default.conf ]; then rm /etc/apache2/sites-enabled/000-default.conf; fi && \
+    ln -s /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-enabled/000-default.conf
+
+
+    # Permisos para install.php
 RUN chmod 755 /usr/share/ocsinventory-reports/ocsreports/install.php && \
     chown www-data:www-data /usr/share/ocsinventory-reports/ocsreports/install.php
 
@@ -33,8 +40,8 @@ EXPOSE 8080
 EXPOSE 80
 EXPOSE 443
 
-# Conectar a la red al correr
-CMD ["bash", "-c", "docker network connect mi-red ocsinventory && apachectl -D FOREGROUND"]
+# ejecutar apache en primer plano
+CMD ["apachectl", "-D", "FOREGROUND"]
 
 # Verificar que Apache escuche en el puerto 8080
 RUN echo "Listen 8080" >> /etc/apache2/ports.conf
