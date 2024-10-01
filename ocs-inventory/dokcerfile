@@ -1,0 +1,46 @@
+# Usa la imagen base de OCS Inventory
+FROM ocsinventory/ocsinventory-docker-image:latest
+
+# Variables de entorno
+ENV TZ="America/Panama"
+ENV OCS_DBNAME=ocsweb
+ENV OCS_DBSERVER_READ=db_ocs
+ENV OCS_DBSERVER_WRITE=db_ocs
+ENV OCS_DBUSER=ocs
+ENV OCS_DBPASS=ocs24cfe
+
+# Instalar dependencias
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y cpanminus build-essential libsnmp-dev iputils-ping vim net-tools apache2-dev && \
+    cpanm XML::Entities SNMP YAML Apache2::SOAP
+
+# Editar archivos de configuración
+COPY dbconfig.inc.php /usr/share/ocsinventory-reports/ocsreports/dbconfig.inc.php
+COPY z-ocsinventory-server.conf /etc/apache2/conf-enabled/z-ocsinventory-server.conf
+COPY zz-ocsinventory-ocsinventory-restapi.conf /etc/apache2/conf-enabled/zz-ocsinventory-ocsinventory-restapi.conf
+COPY ocsinventory-reports.conf /etc/apache2/conf-available/ocsinventory-reports.conf
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY apache2.conf /etc/apache2/apache2.conf
+COPY install.php /usr/share/ocsinventory-reports/ocsreports/install.php
+
+# Permisos para install.php
+RUN chmod 755 /usr/share/ocsinventory-reports/ocsreports/install.php && \
+    chown www-data:www-data /usr/share/ocsinventory-reports/ocsreports/install.php
+
+# Exponer puertos
+EXPOSE 8080
+EXPOSE 80
+EXPOSE 443
+
+# Conectar a la red al correr
+CMD ["bash", "-c", "docker network connect mi-red ocsinventory && apachectl -D FOREGROUND"]
+
+# Verificar que Apache escuche en el puerto 8080
+RUN echo "Listen 8080" >> /etc/apache2/ports.conf
+
+# Verificar el puerto en VirtualHost
+RUN sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:8080>/' /etc/apache2/sites-available/000-default.conf
+
+# Ejecutar cron_all_software.php si está vacío
+RUN /bin/php /usr/share/ocsinventory-reports/ocsreports/crontab/cron_all_software.php || true
