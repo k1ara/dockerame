@@ -2,4 +2,9 @@
 docker build -t ocsinventory-custom
 
 #correr el contenedor
-docker run -it --name ocsinventory-c --network mi-red -p 8080:80 -p 80:80 -p 443:443 ocsinventory-custom
+docker run -it --name ocsinventory-c \
+--network mi-red \
+-p 8080:80 \
+-p 80:80 \
+-p 443:443 \
+ocsinventory-custom
