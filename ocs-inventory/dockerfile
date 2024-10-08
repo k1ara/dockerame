@@ -1,5 +1,5 @@
 # Usa la imagen base de OCS Inventory
-FROM ocsinventory/ocsinventory-docker-image:latest
+FROM ocsinventory-fixed
 
 # Variables de entorno
 ENV TZ="America/Panama"
