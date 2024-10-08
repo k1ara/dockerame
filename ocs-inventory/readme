@@ -1,0 +1,85 @@
+PARA INSTALAR TODO DE MANERA MANUAL, UNICA DE MOMENTO QUE ME HA FUNCIONADO.
+
+docker pull ocsinventory-docker-image:latest   #obtener la ultima imagen del contenedor
+
+INICIAR CONTENEDOR                      #variables que deberian hacer efecto en una imagen de docker correcta
+docker run -it --name ocsinventory \
+--network [mi-red] \
+-p 8080:80 \
+-p 80:80 \
+-p 443:443 \
+-e TZ="America/Panama" \
+-v ocsdata:/usr/share/ocsinventory-reports/ \
+-v ocsdata:/etc/ocsinventory-reports/ \
+-v ocsdata:/var/lib/ocsinventory-reports/ \
+-e OCS_DBNAME=ocsweb \
+-e OCS_DBSERVER_READ=db_ocs \
+-e OCS_DBSERVER_WRITE=db_ocs \
+-e OCS_DBUSER=ocs \
+-e OCS_DBPASS=ocs24cfe \
+ocsinventory/ocsinventory-docker-image:latest /bin/bash  #/bin/bash solo se agrega proque la imagen oficial esta corrupta y hay que editar el contenedor
+
+****************************************************************************
+INSTALAR DEPENDENCIAS
+
+apt update && apt upgrade -y   #actualizar dentro del contenedor
+
+apt-get install -y cpanminus build-essential libsnmp-dev iputils-ping vim net-tools apache2-dev #dependencias y programas utiles
+
+cpanm XML::Entities SNMP YAML Apache2::SOAP    #mas dpeendencias de cpanm
+
+ARCHIVOS QUE EDITAR
+
+-------------------dbconfig.inc.php------------------/usr/share/ocsinventory-reports/ocsreports
+define("DB_NAME", "ocsweb");        #nombre de la base de datos
+define("SERVER_READ", "db_ocs");    #nombre del servidor/contenedor con la base de datos
+define("SERVER_WRITE", "db_ocs");   #nombre del servidor/contenedor con la base de datos
+define("SERVER_PORT", "3306");      #puerto abierto a la base de datos
+define("COMPTE_BASE", "ocs");       #nombre del usuario con permisos para la base de datos
+define("PSWD_BASE", "ocs24cfe");    #contraseña del usuario con permisos para la base de datos
+
+-------------z-ocsinventory-server.conf--------------/etc/apache2/conf-enabled
+#editar los mismos datos de que dbconfig.ini.php
+PerlSetEnv OCS_OPT_DBI_PRINT_ERROR 0    #en esta linea falta en cero.
+PerlSetEnv OCS_OPT_SNMP_LINK_TAG 0      #agregar esta linea en alguna parte
+
+-------------zz-ocsinventory-ocsinventory-restapi.conf--------------/etc/apache2/conf-enabled
+#editar los mismos datos de que dbconfig.ini.php
+
+-------------ocsinventory-reports.conf--------------/etc/apache2/conf-available
+php_value post_max_size         1001m    #editar estas lineas
+php_value upload_max_filesize   1000m    #editar estas lineas
+
+------------------000-default.conf-------------------/etc/apache2/sites-available
+<VirtualHost *:8080>   #verificar que el puerto virtual sea 8080
+
+Alias /ocsreports /usr/share/ocsinventory-reports   #agregar esta linea
+
+----------------------apache2.conf-------------------/etc/apache2
+ServerName localhost         #agregar esta linea al final
+ServerName leliel.cfe.local  #nombre del servidor definido en un DNS server
+
+***************************************************************************
+#conectar a la misma red
+docker network ls
+docker network connect [mi-red] ocsinventory
+
+************************************************************************
+---------------install.php---------------------------/usr/share/ocsinventory-reports/ocsreports/
+#**ARCHIVO INSTALL.PHP PERDIDO**     crearlo dentro de la ruta, el contenido esta en un archivo aparte en este repositorio
+
+**contenido de archivo install.php esta en esta carpeta github**
+
+chmod 755 install.php    #dar permisos de ejecucion
+chown www-data:www-data install.php   #agregar el archivo a los grupos correctos para apache
+
+*************************************************************
+
+------------------ports.conf----------------------/etc/apache2
+VERIFICAR QUE SE ESCUCHE POR EL PUERTO 8080
+Listen 8080   #agregar esta linea si no esta
+
+---------------cron_all_software.php--------------/usr/share/ocsinventory-reports/ocsreports/crontab
+SI ALL_SOFTWARE EN EL INVENTARIO ESTÁ VACIO EJECUTAR LA LINEA
+
+/bin/php /usr/share/ocsinventory-reports/ocsreports/crontab/cron_all_software.php #activar este proceso
