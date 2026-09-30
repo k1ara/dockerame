@@ -1,0 +1,19 @@
+services:
+  glpi:
+    image: "glpi/glpi:latest"
+    container_name: glpi
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8080:80"
+    environment:
+      - TZ=America/Panama
+    volumes:
+      - "./storage/glpi:/var/glpi:rw"
+      - "./php-conf/zz-timezone.ini:/usr/local/etc/php/conf.d/zz-timezone.ini:ro"
+    networks:
+      - mi-red
+
+networks:
+  mi-red:
+    external: true
