@@ -1,0 +1,33 @@
+services:
+  ocsinventory:
+    image: ocsinventory/ocsinventory-docker-image:2.12.3
+    container_name: ocs-inventory
+    restart: always
+    networks:
+      - mi-red
+
+    ports:
+      - "80:80"     # HTTP  -> http://leliel.cfe.local/ocsreports
+      - "8843:443"    # HTTPS -> https://leliel.cfe.local:8443/ocsreports
+      
+    devices:
+      - /dev/urandom:/dev/urandom
+      - /dev/random:/dev/random
+
+    environment:
+      TZ: America/Panama
+      AUTH_TYPE: "1"
+      OCS_DB_SERVER: maria-db  # 🔒 cámbialo si usas otro host o contenedor
+      OCS_DB_PORT: "3306"
+      OCS_DB_NAME: ocsweb
+      OCS_DB_USER: ocs
+      OCS_DB_PASS: ocs24cfe
+   
+    volumes:
+      - ./ocs-data:/var/lib/ocsinventory-reports # 🔒 crear este volumen manualmente (carpeta)
+      - ./ocs-logs:/var/log/ocsinventory-server  # 🔒 crear este volumen manualmente (carpeta)
+
+networks:
+  mi-red:
+    external: true # 🔒 importante si la red ya existe
+
